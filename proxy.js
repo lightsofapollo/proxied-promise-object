@@ -19,8 +19,12 @@ function proxy(method) {
 }
 
 function Proxy(Promise, object) {
+  if (!(this instanceof Proxy)) return new Proxy(Promise, object);
+  if (object.$proxypromiseobject) return object;
+
   this.Promise = Promise;
   this.subject = object;
+  this.$proxypromiseobject = true;
 
   for (var key in object) {
     if (typeof object[key] !== 'function') continue;

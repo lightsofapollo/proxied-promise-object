@@ -1,8 +1,8 @@
 suite('proxy', function() {
-  var Proxy = require('./');
+  var proxy = require('./');
   var Promise = require('promise');
   var fs = require('fs');
-  var fsP = new Proxy(Promise, fs);
+  var fsP = proxy(Promise, fs);
 
   test('successful promise', function(done) {
     var expected = fs.readFileSync('package.json', 'utf8');
@@ -35,7 +35,7 @@ suite('proxy', function() {
 
   test('sync error from proxied object', function(done) {
     var err = new Error('WTFD');
-    var obj = new Proxy(Promise, {
+    var obj = proxy(Promise, {
       throws: function() {
         throw err;
       }
@@ -45,5 +45,10 @@ suite('proxy', function() {
       assert.equal(err, given);
       done();
     });
+  });
+
+  test('avoid double wrapping the object', function() {
+    var anotherFsP = proxy(Promise, fsP);
+    assert.equal(anotherFsP, fsP);
   });
 });
