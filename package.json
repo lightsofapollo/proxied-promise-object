@@ -2,7 +2,7 @@
   "name": "proxied-promise-object",
   "version": "0.0.0",
   "description": "wrap an object's callback methods with promise returning ones",
-  "main": "index.js",
+  "main": "proxy.js",
   "scripts": {
     "test": "make test"
   },
