@@ -1,0 +1,29 @@
+{
+  "name": "proxied-promise-object",
+  "version": "0.0.0",
+  "description": "wrap an object's callback methods with promise returning ones",
+  "main": "index.js",
+  "scripts": {
+    "test": "make test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/lightsofapollo/proxied-promise-object.git"
+  },
+  "keywords": [
+    "promise",
+    "proxy",
+    "object",
+    "denodeify"
+  ],
+  "author": "James Lal [:lightsofapollo]",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lightsofapollo/proxied-promise-object/issues"
+  },
+  "devDependencies": {
+    "promise": "~3.2.0",
+    "mocha": "~1.16.2",
+    "matcha": "~0.4.1"
+  }
+}
