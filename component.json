@@ -1,0 +1,16 @@
+{
+  "name": "proxied-promise-object",
+  "repo": "lightsofapollo/proxied-promise-object",
+  "description": "Promiseify Objects",
+  "version": "0.2.0",
+  "keywords": [],
+  "dependencies": {
+  },
+  "development": {
+  },
+  "license": "MIT",
+  "main": "proxy.js",
+  "scripts": [
+    "proxy.js"
+  ]
+}
