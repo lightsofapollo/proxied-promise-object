@@ -18,11 +18,17 @@ function proxy(method) {
   }
 }
 
-function Proxy(Promise, object) {
-  if (!(this instanceof Proxy)) return new Proxy(Promise, object);
+function Proxy(PromiseObj, object) {
+  if (typeof object === 'undefined') {
+    object = PromiseObj;
+    // attempt to use a global promise object if available
+    PromiseObj = Promise;
+  }
+
+  if (!(this instanceof Proxy)) return new Proxy(PromiseObj, object);
   if (object.$proxypromiseobject) return object;
 
-  this.Promise = Promise;
+  this.Promise = PromiseObj;
   this.subject = object;
   this.$proxypromiseobject = true;
 

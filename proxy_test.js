@@ -51,4 +51,11 @@ suite('proxy', function() {
     var anotherFsP = proxy(Promise, fsP);
     assert.equal(anotherFsP, fsP);
   });
+
+  test('with global Promise', function() {
+    global.Promise = Promise;
+    var fsProxy = proxy(fs);
+    var stat = fsProxy.stat('/xfoo');
+    assert.ok(stat.then);
+  });
 });
