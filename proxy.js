@@ -1,8 +1,6 @@
-function proxy(method) {
+function proxy(method, subject) {
   return function() {
     var args = Array.prototype.slice.call(arguments);
-    var subject = this.subject;
-
     return new this.Promise(function(accept, reject) {
       args.push(function(err, value) {
         if (err) return reject(err);
@@ -18,23 +16,57 @@ function proxy(method) {
   }
 }
 
-function Proxy(PromiseObj, object) {
-  if (typeof object === 'undefined') {
-    object = PromiseObj;
-    // attempt to use a global promise object if available
-    PromiseObj = Promise;
+// Create getters for the underlying objects if it's not a function.
+// NOTE: This is as slow and potentially sketchy as it looks.
+function createGetter(target, property, subject) {
+  var targetDesc = {
+    enumerable: subject.propertyIsEnumerable(property),
+    get: function() {
+      return subject[property];
+    },
+    set: function(value) {
+      subject[property] = value;
+    }
+  };
+
+  Object.defineProperty(target, property, targetDesc);
+}
+
+function Proxy(object, PromiseObj, options) {
+  PromiseObj = PromiseObj || Promise;
+  if (!PromiseObj) {
+    throw new Error('Invalid promise object given or cannot find global');
   }
 
-  if (!(this instanceof Proxy)) return new Proxy(PromiseObj, object);
+  if (!(this instanceof Proxy)) return new Proxy(object, PromiseObj, options);
   if (object.$proxypromiseobject) return object;
+  options = options || {};
+
+  // Traverse all levels by default.
+  if (!('deep' in options)) options.deep = true;
 
   this.Promise = PromiseObj;
-  this.subject = object;
+
+  // Protects against double wrapping and circular references.
   this.$proxypromiseobject = true;
 
   for (var key in object) {
-    if (typeof object[key] !== 'function') continue;
-    this[key] = proxy(key);
+    // Sanity check for older JS engines just in case...
+    switch (typeof object[key]) {
+      case 'object':
+        if (options.deep && !Array.isArray(object[key])) {
+          this[key] = new Proxy(object[key], PromiseObj, options);
+        } else {
+          // If it's not deep then just stop here...
+          createGetter(this, key, object);
+        }
+        break;
+      case 'function':
+        this[key] = proxy(key, object);
+        break;
+      default:
+        createGetter(this, key, object);
+    }
   }
 }
 

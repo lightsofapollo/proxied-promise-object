@@ -2,7 +2,7 @@ suite('proxy', function() {
   var proxy = require('./');
   var Promise = require('promise');
   var fs = require('fs');
-  var fsP = proxy(Promise, fs);
+  var fsP = proxy(fs, Promise);
 
   test('successful promise', function(done) {
     var expected = fs.readFileSync('package.json', 'utf8');
@@ -35,11 +35,11 @@ suite('proxy', function() {
 
   test('sync error from proxied object', function(done) {
     var err = new Error('WTFD');
-    var obj = proxy(Promise, {
+    var obj = proxy({
       throws: function() {
         throw err;
       }
-    });
+    }, Promise);
 
     obj.throws().then(null, function(given) {
       assert.equal(err, given);
@@ -48,7 +48,7 @@ suite('proxy', function() {
   });
 
   test('avoid double wrapping the object', function() {
-    var anotherFsP = proxy(Promise, fsP);
+    var anotherFsP = proxy(fsP, Promise);
     assert.equal(anotherFsP, fsP);
   });
 
@@ -57,5 +57,36 @@ suite('proxy', function() {
     var fsProxy = proxy(fs);
     var stat = fsProxy.stat('/xfoo');
     assert.ok(stat.then);
+  });
+
+  test('getter/setters', function() {
+    var obj = {
+      prop: ['1', '2', '3']
+    };
+
+    var objProxy = proxy(obj, Promise);
+    assert.equal(objProxy.prop, obj.prop);
+
+    objProxy.prop = 'zfoo';
+    assert.equal(obj.prop, 'zfoo');
+  });
+
+  test('deep wrapping', function(done) {
+    var constructor = function() {};
+    constructor.prototype = {
+      a: { prop: 1 },
+      funcs: {
+        func: function(callback) {
+          callback();
+        }
+      }
+    }
+
+
+    var objProxy = proxy(new constructor(), Promise, {
+      deep: true
+    });
+    assert.equal(objProxy.a.prop, 1);
+    objProxy.funcs.func().then(done);
   });
 });

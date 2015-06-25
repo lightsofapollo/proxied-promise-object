@@ -1,10 +1,10 @@
 {
   "name": "proxied-promise-object",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "description": "wrap an object's callback methods with promise returning ones",
   "main": "proxy.js",
   "scripts": {
-    "test": "make test"
+    "test": "mocha proxy_test.js"
   },
   "repository": {
     "type": "git",
