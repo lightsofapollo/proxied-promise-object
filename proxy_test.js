@@ -75,6 +75,7 @@ suite('proxy', function() {
     var constructor = function() {};
     constructor.prototype = {
       a: { prop: 1 },
+      z: null,
       funcs: {
         func: function(callback) {
           callback();
@@ -87,6 +88,7 @@ suite('proxy', function() {
       deep: true
     });
     assert.equal(objProxy.a.prop, 1);
+    assert.equal(objProxy.z, null);
     objProxy.funcs.func().then(done);
   });
 });

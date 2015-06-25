@@ -37,7 +37,7 @@ function Proxy(object, PromiseObj, options) {
   if (!PromiseObj) {
     throw new Error('Invalid promise object given or cannot find global');
   }
-
+  if (!object) throw new Error('Invalid proxy object');
   if (!(this instanceof Proxy)) return new Proxy(object, PromiseObj, options);
   if (object.$proxypromiseobject) return object;
   options = options || {};
@@ -54,7 +54,7 @@ function Proxy(object, PromiseObj, options) {
     // Sanity check for older JS engines just in case...
     switch (typeof object[key]) {
       case 'object':
-        if (options.deep && !Array.isArray(object[key])) {
+        if (options.deep && object[key] && !Array.isArray(object[key])) {
           this[key] = new Proxy(object[key], PromiseObj, options);
         } else {
           // If it's not deep then just stop here...
